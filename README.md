@@ -1,5 +1,9 @@
 # Smart Surveillance System for Jetson Nano
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
+[![CI Tests](https://github.com/username/smart-surveillance-system/actions/workflows/python-tests.yml/badge.svg)](https://github.com/username/smart-surveillance-system/actions/workflows/python-tests.yml)
+
 A Python-based intruder detection system that leverages YOLOv8 with TensorRT optimization to efficiently process video streams on the NVIDIA Jetson Nano. The system includes zone-based intrusion detection, alerting mechanisms, and performance benchmarking.
 
 ## Video example :
@@ -232,3 +236,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - YOLOv8 by Ultralytics
 - NVIDIA for Jetson Nano and TensorRT 
+
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Continuous Integration
+
+The CI badge shows the status of automated tests that run in GitHub Actions. Note that these tests are limited to non-hardware dependent functionality since GitHub Actions runners don't have access to Jetson Nano hardware. For full testing, please run the tests on actual Jetson hardware.
+
+```bash
+# Run full test suite on Jetson hardware
+python3 scripts/test_system.py
+
+# Run benchmarks to test performance
+python3 src/intruder_detection.py --benchmark
+``` 

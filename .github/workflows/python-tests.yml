@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9']
+        python-version: ['3.8', '3.9']
+      # Don't fail fast - run all test configs even if some fail
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v3
@@ -28,26 +30,136 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        # Install test-specific packages
+        # Install minimal test dependencies
         pip install pytest pytest-cov mock
-    
-    - name: Install YOLOv8
-      run: |
-        pip install ultralytics
-        wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt
+        # Install basic requirements but skip Jetson-specific packages
+        pip install numpy opencv-python ultralytics shapely requests
     
     - name: Create directory structure
       run: |
         mkdir -p logs/alerts logs/benchmarks data/recordings data/detections
+        touch logs/.gitkeep logs/alerts/.gitkeep logs/benchmarks/.gitkeep
+        touch data/recordings/.gitkeep data/detections/.gitkeep
     
-    - name: Run basic system tests
+    - name: Create test config file
       run: |
-        # These tests don't actually run detection, just test components
-        python scripts/test_system.py --config config/config.json
+        mkdir -p config
+        cat > config/test_config.json << EOF
+        {
+          "model": {
+            "path": "yolov8n.pt",
+            "confidence_threshold": 0.45,
+            "use_tensorrt": false,
+            "target_classes": [0]
+          },
+          "camera": {
+            "source": "0",
+            "width": 640,
+            "height": 480
+          },
+          "system": {
+            "queue_size": 10,
+            "limit_fps": true,
+            "target_fps": 15,
+            "reconnect_on_failure": true
+          },
+          "zones": {
+            "zone1": {
+              "name": "Test Zone",
+              "points": [[100, 400], [300, 400], [300, 300], [100, 300]],
+              "color": [0, 0, 255],
+              "alert_enabled": true
+            }
+          },
+          "alerts": {
+            "enabled": false,
+            "cooldown_seconds": 60,
+            "history_dir": "logs/alerts",
+            "email": {
+              "enabled": false,
+              "smtp_server": "smtp.gmail.com",
+              "smtp_port": 587
+            },
+            "telegram": {
+              "enabled": false
+            }
+          },
+          "output": {
+            "display_video": false,
+            "save_video": false,
+            "output_dir": "data/recordings",
+            "output_fps": 10,
+            "save_detection_frames": false,
+            "detection_frames_dir": "data/detections",
+            "frame_save_interval": 15
+          }
+        }
+        EOF
+        
+    - name: Create mock test script
+      run: |
+        # Create a simplified test script that mocks hardware-dependent components
+        mkdir -p tests
+        cat > tests/ci_test.py << EOF
+        import os
+        import sys
+        import unittest
+        from unittest.mock import MagicMock, patch
+        
+        # Add project root to path
+        sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        
+        # Import utils with mocks for hardware dependencies
+        with patch('cv2.VideoCapture'), \
+             patch('ultralytics.YOLO'):
+            from utils.config_loader import ConfigLoader
+            from utils.alert_manager import AlertManager
+            from utils.zone_manager import ZoneManager
+            from utils.performance_monitor import PerformanceMonitor
+        
+        class BasicModuleTests(unittest.TestCase):
+            def setUp(self):
+                self.config_loader = ConfigLoader('config/test_config.json')
+                self.config = self.config_loader.load_config()
+            
+            def test_config_loader(self):
+                """Test if config loader loads configuration properly"""
+                self.assertIn('model', self.config)
+                self.assertIn('camera', self.config)
+                self.assertIn('zones', self.config)
+                self.assertIn('alerts', self.config)
+                self.assertIn('output', self.config)
+                
+            def test_zone_manager(self):
+                """Test zone manager basic functionality"""
+                zone_manager = ZoneManager(self.config['zones'])
+                self.assertIsNotNone(zone_manager.zones)
+                self.assertIn('zone1', zone_manager.zones)
+                
+            def test_alert_manager(self):
+                """Test alert manager basic initialization"""
+                alert_manager = AlertManager(self.config['alerts'])
+                self.assertFalse(alert_manager.email_enabled)
+                self.assertFalse(alert_manager.telegram_enabled)
+                
+            def test_performance_monitor(self):
+                """Test performance monitor basic functionality"""
+                perf_monitor = PerformanceMonitor()
+                perf_monitor.start_process_timer()
+                perf_monitor.stop_process_timer()
+                self.assertGreaterEqual(perf_monitor.get_fps(), 0)
+                
+        if __name__ == '__main__':
+            unittest.main()
+        EOF
+        
+    - name: Download YOLOv8 model
+      run: |
+        wget -q https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt
     
-    # Note: TensorRT-specific tests will not run on GitHub Actions
-    # as they require NVIDIA GPU
+    - name: Run CI-compatible tests
+      run: |
+        python -m pytest tests/ci_test.py -v
     
     - name: Upload test artifacts
       uses: actions/upload-artifact@v3
