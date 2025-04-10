@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.6+](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/)
-[![CI Tests](https://github.com/username/smart-surveillance-system/actions/workflows/python-tests.yml/badge.svg)](https://github.com/username/smart-surveillance-system/actions/workflows/python-tests.yml)
+[![CI Tests](https://github.com/pasqualeclarizio83/smart-surveillance-system/actions/workflows/python-tests.yml/badge.svg)](https://github.com/pasqualeclarizio83/smart-surveillance-system/actions/workflows/python-tests.yml)
 
 A Python-based intruder detection system that leverages YOLOv8 with TensorRT optimization to efficiently process video streams on the NVIDIA Jetson Nano. The system includes zone-based intrusion detection, alerting mechanisms, and performance benchmarking.
 
@@ -243,10 +243,12 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ### Continuous Integration
 
-The CI badge shows the status of automated tests that run in GitHub Actions. Note that these tests are limited to non-hardware dependent functionality since GitHub Actions runners don't have access to Jetson Nano hardware. For full testing, please run the tests on actual Jetson hardware.
+The CI badge shows the status of automated tests that run in GitHub Actions. These tests are **very limited** and only verify basic project structure and configuration - they don't test the actual detection functionality since GitHub Actions runners don't have access to Jetson Nano hardware or GPU resources.
+
+For full testing, please run the tests on actual Jetson hardware:
 
 ```bash
-# Run full test suite on Jetson hardware
+# Run full test suite on Jetson hardware 
 python3 scripts/test_system.py
 
 # Run benchmarks to test performance
