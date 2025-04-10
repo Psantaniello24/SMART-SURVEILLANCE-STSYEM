@@ -1,0 +1,62 @@
+{
+    "model": {
+        "path": "yolov8n.pt",
+        "confidence_threshold": 0.45,
+        "use_tensorrt": true,
+        "target_classes": [0]
+    },
+    "camera": {
+        "source": "0",
+        "width": 640,
+        "height": 480
+    },
+    "system": {
+        "queue_size": 10,
+        "limit_fps": true,
+        "target_fps": 15,
+        "reconnect_on_failure": true
+    },
+    "zones": {
+        "zone1": {
+            "name": "Main Entrance",
+            "points": [[100, 400], [300, 400], [300, 300], [100, 300]],
+            "color": [0, 0, 255],
+            "alert_enabled": true
+        },
+        "zone2": {
+            "name": "Side Door",
+            "points": [[400, 400], [600, 400], [600, 300], [400, 300]],
+            "color": [0, 255, 0],
+            "alert_enabled": true
+        }
+    },
+    "alerts": {
+        "enabled": true,
+        "cooldown_seconds": 60,
+        "history_dir": "logs/alerts",
+        "email": {
+            "enabled": false,
+            "smtp_server": "smtp.gmail.com",
+            "smtp_port": 587,
+            "username": "your-email@gmail.com",
+            "password": "your-app-password",
+            "from_email": "your-email@gmail.com",
+            "to_email": "recipient@example.com",
+            "subject": "Intruder Alert!"
+        },
+        "telegram": {
+            "enabled": false,
+            "bot_token": "your-bot-token",
+            "chat_id": "your-chat-id"
+        }
+    },
+    "output": {
+        "display_video": true,
+        "save_video": true,
+        "output_dir": "data/recordings",
+        "output_fps": 10,
+        "save_detection_frames": true,
+        "detection_frames_dir": "data/detections",
+        "frame_save_interval": 15
+    }
+} 

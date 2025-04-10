@@ -1,0 +1,71 @@
+.qodo
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Python Virtual Environments
+venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# Models
+*.onnx
+*.engine
+# Uncomment if you want to exclude YOLOv8 models from git
+# *.pt
+
+# Data directories
+data/recordings/*
+data/detections/*
+!data/recordings/.gitkeep
+!data/detections/.gitkeep
+
+# Logs
+logs/*
+!logs/.gitkeep
+!logs/alerts/.gitkeep
+!logs/benchmarks/.gitkeep
+
+# Alerts
+logs/alerts/*
+logs/benchmarks/*
+
+# Custom files
+zone_config_*.jpg
+test_alert.jpg
+
+# OS specific files
+.DS_Store
+Thumbs.db
