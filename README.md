@@ -55,7 +55,7 @@ A Python-based intruder detection system that leverages YOLOv8 with TensorRT opt
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/username/smart-surveillance-system.git
+   git clone https://github.com/Psantaniello24/SMART-SURVEILLANCE-SYSTEM.git
    cd smart-surveillance-system
    ```
 
